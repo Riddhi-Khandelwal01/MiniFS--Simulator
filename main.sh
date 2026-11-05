@@ -4,22 +4,75 @@
 # Mini File System Simulator - Main Controller
 # ==========================================
 
+# Check whether all required modules exist
+required_modules=(
+    "modules/disk.sh"
+    "modules/directory.sh"
+    "modules/file.sh"
+    "modules/utilities.sh"
+)
+
+for module in "${required_modules[@]}"
+do
+    if [ ! -f "$module" ]; then
+        echo "Error: Required module '$module' is missing."
+        exit 1
+    fi
+done
+
 # Load all project modules
 source modules/disk.sh
 source modules/directory.sh
 source modules/file.sh
 source modules/utilities.sh
 
+# Display welcome message
+clear
 echo "========================================="
-echo "      Welcome to Mini File System"
+echo "       MINI FILE SYSTEM SIMULATOR"
 echo "========================================="
 echo "Type 'help' to see available commands."
+echo
+
+# Function to display all commands
+show_help() {
+    echo "Available commands:"
+    echo
+    echo "  DISK:"
+    echo "    format              Initialize the Mini File System"
+    echo "    df                  Show disk usage"
+    echo
+    echo "  DIRECTORY:"
+    echo "    mkdir <name>        Create a directory"
+    echo "    ls                  List directory contents"
+    echo "    cd <directory>      Change directory"
+    echo "    pwd                 Show current directory"
+    echo "    rmdir <name>        Remove a directory"
+    echo
+    echo "  FILE:"
+    echo "    touch <name>        Create a file"
+    echo "    cat <file>          Display file contents"
+    echo "    cp <source> <dest>  Copy a file"
+    echo "    mv <source> <dest>  Move or rename a file"
+    echo "    rm <name>           Remove a file"
+    echo
+    echo "  UTILITIES:"
+    echo "    chmod <perm> <file> Change permissions"
+    echo "    stat <name>         Show file information"
+    echo "    du <name>           Show directory usage"
+    echo
+    echo "  SYSTEM:"
+    echo "    help                Show this help message"
+    echo "    clear               Clear the screen"
+    echo "    about               Show project information"
+    echo "    exit                Exit MiniFS"
+}
 
 # Main command loop
 while true
 do
-    echo -n "MiniFS> "
-    read -r command arguments
+    echo
+    read -r -p "MiniFS> " command arguments
 
     case $command in
 
@@ -87,35 +140,36 @@ do
             show_directory_usage "$arguments"
             ;;
 
-        # Help command
+        # System commands controlled by main.sh
         help)
-            echo "Available commands:"
-            echo "  format              - Initialize the Mini File System"
-            echo "  mkdir <name>        - Create a directory"
-            echo "  ls                  - List directory contents"
-            echo "  cd <directory>      - Change directory"
-            echo "  pwd                 - Show current directory"
-            echo "  rmdir <name>        - Remove a directory"
-            echo "  touch <name>        - Create a file"
-            echo "  cat <file>          - Display file contents"
-            echo "  cp <source> <dest>  - Copy a file"
-            echo "  mv <source> <dest>  - Move or rename a file"
-            echo "  rm <name>           - Remove a file"
-            echo "  chmod <perm> <file> - Change permissions"
-            echo "  stat <name>         - Show file information"
-            echo "  df                  - Show disk usage"
-            echo "  du <name>           - Show directory usage"
-            echo "  help                - Show this help message"
-            echo "  exit                - Exit the Mini File System"
+            show_help
             ;;
 
-        # Exit command
+        clear)
+            clear
+            ;;
+
+        about)
+            echo "Mini File System Simulator"
+            echo "A simplified simulation of Unix file system operations."
+            echo "Developed as a Unix project."
+            ;;
+
         exit)
-            echo "Exiting Mini File System..."
-            break
+            read -r -p "Are you sure you want to exit? (y/n): " choice
+
+            case $choice in
+                y|Y|yes|YES)
+                    echo "Exiting Mini File System..."
+                    break
+                    ;;
+                *)
+                    echo "Returning to MiniFS..."
+                    ;;
+            esac
             ;;
 
-        # Empty input
+        # Empty command
         "")
             ;;
 
