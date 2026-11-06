@@ -24,13 +24,13 @@ dir_normalize() {
     local result=""
     local part
 
-    if [[ "$input" == /* ]]; then
+    if [["$input"==/*]]; then
         full_path="$input"
     else
         full_path="$CURRENT_DIR/$input"
     fi
 
-    IFS='/' read -ra parts <<< "$full_path"
+    IFS='/' read -ra parts<<<"$full_path"
 
     for part in "${parts[@]}"; do
         case "$part" in
@@ -50,6 +50,7 @@ dir_normalize() {
 
     echo "${result:-/}"
 }
+
 
 
 # Create a directory
@@ -103,24 +104,12 @@ dir_ls() {
     local item
     local remaining
 
-    # List directories
     for item in "${!DIRS[@]}"; do
         if [[ "$item" == "$prefix"* && "$item" != "$path" ]]; then
             remaining="${item#"$prefix"}"
 
             if [[ "$remaining" != */* && -n "$remaining" ]]; then
                 children+=("$remaining/")
-            fi
-        fi
-    done
-
-    # List files
-    for item in "${!FILES[@]}"; do
-        if [[ "$item" == "$prefix"* ]]; then
-            remaining="${item#"$prefix"}"
-
-            if [[ "$remaining" != */* && -n "$remaining" ]]; then
-                children+=("$remaining")
             fi
         fi
     done
@@ -196,25 +185,16 @@ dir_rmdir() {
 
     local item
 
-    # Check for subdirectories
-for item in "${!DIRS[@]}"; do
-    if [[ "$item" == "$path/"* ]]; then
-        echo "Error: Directory is not empty."
-        return 1
-    fi
-done
+    for item in "${!DIRS[@]}"; do
+        if [[ "$item" == "$path/"* ]]; then
+            echo "Error: Directory is not empty."
+            return 1
+        fi
+    done
 
-# Check for files
-for item in "${!FILES[@]}"; do
-    if [[ "$item" == "$path/"* ]]; then
-        echo "Error: Directory is not empty."
-        return 1
-    fi
-done
+    unset 'DIRS[$path]'
 
-unset 'DIRS[$path]'
-
-echo "Directory removed: $path"
+    echo "Directory removed: $path"
 }
 
 
