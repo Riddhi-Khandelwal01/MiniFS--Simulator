@@ -1,119 +1,34 @@
-# Mini File System Simulator (MiniFS)
+# Mini File System Simulator
 
-A UNIX-based Mini File System Simulator developed using **Bash scripting**. The project provides a command-line interface that simulates basic file system operations such as directory management, file handling, disk management, and other utility commands.
+MiniFS is a Bash project that keeps simulated directories in the `DIRS` array and file contents in the `FILES` array. It is intended to run in Ubuntu or another Linux system with Bash 4 or newer.
 
-## Features
-
-- Interactive command-line interface
-- Disk formatting and storage management
-- Directory management
-- File management
-- Basic file system utility commands
-- Command help and validation
-- Modular project structure
-
-## Project Structure
-
-```text
-Mini-File-System-Simulator-UNIX/
-│
-├── main.sh                 # Main command controller
-├── modules/
-│   ├── disk.sh             # Disk formatting and storage management
-│   ├── directory.sh        # Directory management functions
-│   ├── file.sh             # File management functions
-│   └── utilities.sh        # Additional utility functions
-│
-├── .gitignore
-└── README.md
-```
-
-> Some modules may be added or expanded as the project develops.
-
-## Requirements
-
-- Linux or WSL
-- Bash shell
-
-## How to Run
-
-### 1. Clone the repository
-
-Clone the project repository and navigate to the project folder.
-
-### 2. Run the program
+## Run
 
 ```bash
 bash main.sh
 ```
 
-The MiniFS command interface will start.
+At the prompt, run `format` first. Formatting clears the on-disk disk-information folder; file and directory data are currently held in memory by the other modules.
 
-## Available Commands
+## Commands
 
 | Command | Description |
-|---------|-------------|
-| `help` | Display available commands |
-| `format` | Format and initialize the MiniFS storage |
-| `df` | Display disk usage information |
-| `mkdir` | Create a directory |
-| `ls` | List directory contents |
-| `cd` | Change the current directory |
-| `pwd` | Display the current directory |
-| `rmdir` | Remove a directory |
-| `touch` | Create a file |
-| `cat` | Display file contents |
-| `cp` | Copy a file |
-| `mv` | Move or rename a file |
-| `rm` | Remove a file |
-| `chmod` | Modify file permissions |
-| `stat` | Display file information |
-| `du` | Display directory storage usage |
-| `exit` | Exit the MiniFS simulator |
+| --- | --- |
+| `format` | Initialize the simulated disk |
+| `mkdir`, `ls`, `cd`, `pwd`, `rmdir` | Manage directories |
+| `touch`, `cat`, `cp`, `mv`, `rm` | Manage simulated files |
+| `chmod <mode> <path>` | Set a simulated octal permission mode, such as `640` |
+| `ln <target> <link>` | Make a hard link to a simulated file |
+| `ln -s <target> <link>` | Make a symbolic link to a simulated file |
+| `stat <path>` | Show type, mode, inode, size and link count |
+| `df` | Show simulated capacity and used space |
+| `du [path]` | Show file data used below a path |
+| `help`, `clear`, `about`, `exit` | Prompt controls |
 
-## Example Usage
+The prompt accepts whitespace-separated arguments, so names with spaces are not supported. Permissions are simulated metadata and do not restrict commands. Links are represented in the in-memory file table; symbolic links to directories and dangling symbolic links are not supported.
 
-```text
-MiniFS> format
-MiniFS> df
-MiniFS> mkdir documents
-MiniFS> ls
-MiniFS> exit
-```
+## Member 4 utilities
 
-## Project Architecture
+The utility functions are in `modules/utilities.sh`. They use the existing `DIRS` and `FILES` arrays and keep permission modes, inode numbers, and symbolic-link targets in small Bash associative arrays. File sizes are measured in bytes; disk and directory usage are reported in 1 KB blocks. Hard links share an inode and are counted once by `df` and `du`.
 
-The project follows a modular structure:
-
-```text
-User Command
-     │
-     ▼
-   main.sh
-     │
-     ├── disk.sh
-     ├── directory.sh
-     ├── file.sh
-     └── utilities.sh
-```
-
-The `main.sh` file acts as the central command controller. It receives commands from the user and routes them to the appropriate functions in the corresponding modules.
-
-## Team Contributions
-
-The project is developed collaboratively, with different members responsible for different modules and functionalities.
-
-## Notes
-
-The `mini_fs_storage/` directory is generated during program execution and is excluded from version control using `.gitignore`.
-
-## Future Improvements
-
-- Enhanced error handling
-- Improved file permission simulation
-- Additional UNIX command support
-- Improved storage and metadata management
-
----
-
-**Developed as a UNIX/Operating Systems project using Bash scripting.**
+`docs/project_documentation.md` describes the utility behavior and integration notes.

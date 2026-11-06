@@ -58,8 +58,10 @@ show_help() {
     echo
     echo "  UTILITIES:"
     echo "    chmod <perm> <file> Change permissions"
+    echo "    ln <target> <link> Create a hard link"
+    echo "    ln -s <target> <link> Create a symbolic link"
     echo "    stat <name>         Show file information"
-    echo "    du <name>           Show directory usage"
+    echo "    du [path]           Show directory usage"
     echo
     echo "  SYSTEM:"
     echo "    help                Show this help message"
@@ -73,6 +75,7 @@ while true
 do
     echo
     read -r -p "MiniFS> " command arguments
+    read -r -a command_args <<< "$arguments"
 
     case $command in
 
@@ -83,53 +86,63 @@ do
 
         # Directory commands
         mkdir)
-            create_directory "$arguments"
+            dir_mkdir "${command_args[@]}"
             ;;
 
         ls)
-            list_directory "$arguments"
+            dir_ls "${command_args[@]}"
             ;;
 
         cd)
-            change_directory "$arguments"
+            dir_cd "${command_args[@]}"
             ;;
 
         pwd)
-            show_current_directory
+            dir_pwd
             ;;
 
         rmdir)
-            remove_directory "$arguments"
+            if dir_rmdir "${command_args[@]}"; then
+                utilities_forget_path "${command_args[0]}"
+            fi
             ;;
 
         # File commands
         touch)
-            create_file "$arguments"
+            fs_touch "${command_args[@]}"
             ;;
 
         cat)
-            display_file "$arguments"
+            fs_cat "${command_args[@]}"
             ;;
 
         cp)
-            copy_file $arguments
+            fs_cp "${command_args[@]}"
             ;;
 
         mv)
-            move_file $arguments
+            if fs_mv "${command_args[@]}"; then
+                utilities_move_metadata "${command_args[0]}" "${command_args[1]}"
+            fi
             ;;
 
         rm)
-            remove_file "$arguments"
+            if fs_rm "${command_args[@]}"; then
+                utilities_forget_path "${command_args[0]}"
+            fi
             ;;
 
         # Utility commands
         chmod)
-            change_permissions $arguments
+            change_permissions "${command_args[@]}"
+            ;;
+
+        ln)
+            create_link "${command_args[@]}"
             ;;
 
         stat)
-            show_statistics "$arguments"
+            show_statistics "${command_args[@]}"
             ;;
 
         df)
@@ -137,7 +150,7 @@ do
             ;;
 
         du)
-            show_directory_usage "$arguments"
+            show_directory_usage "${command_args[@]}"
             ;;
 
         # System commands controlled by main.sh
