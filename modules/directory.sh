@@ -24,7 +24,7 @@ dir_normalize() {
     local result=""
     local part
 
-    if [["$input"==/*]]; then
+    if [[ "$input" == /* ]]; then
         full_path="$input"
     else
         full_path="$CURRENT_DIR/$input"
@@ -104,12 +104,24 @@ dir_ls() {
     local item
     local remaining
 
+    # List subdirectories
     for item in "${!DIRS[@]}"; do
         if [[ "$item" == "$prefix"* && "$item" != "$path" ]]; then
             remaining="${item#"$prefix"}"
 
             if [[ "$remaining" != */* && -n "$remaining" ]]; then
                 children+=("$remaining/")
+            fi
+        fi
+    done
+
+    # List files
+    for item in "${!FILES[@]}"; do
+        if [[ "$item" == "$prefix"* ]]; then
+            remaining="${item#"$prefix"}"
+
+            if [[ "$remaining" != */* && -n "$remaining" ]]; then
+                children+=("$remaining")
             fi
         fi
     done
@@ -191,6 +203,13 @@ dir_rmdir() {
             return 1
         fi
     done
+
+    for item in "${!FILES[@]}"; do
+    if [[ "$item" == "$path/"* ]]; then
+        echo "Error: Directory is not empty."
+        return 1
+    fi
+done
 
     unset 'DIRS[$path]'
 
