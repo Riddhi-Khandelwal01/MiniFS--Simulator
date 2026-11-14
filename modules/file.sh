@@ -68,6 +68,33 @@ fs_touch() {
     echo "File created: $path"
 }
 
+# ------------------------------------------
+# 2. WRITE CONTENT TO FILE (write)
+# ------------------------------------------
+
+fs_write() {
+    if [[ $# -lt 2 || -z "$1" ]]; then
+        echo "Error: Usage: write <filename> <content>"
+        return 1
+    fi
+
+    local filename="$1"
+    local path
+
+    path=$(fs_resolve_path "$filename")
+
+    shift
+    local content="$*"
+
+    if [[ -z "${FILES[$path]+exists}" ]]; then
+        echo "Error: File '$filename' does not exist."
+        return 1
+    fi
+
+    FILES["$path"]="$content"
+
+    echo "Content written to: $filename"
+}
 
 # ------------------------------------------
 # 2. DISPLAY FILE CONTENTS (cat)
