@@ -51,6 +51,7 @@ show_help() {
     echo
     echo "  FILE:"
     echo "    touch <name>        Create a file"
+    echo "    write <file> <content>  Write content to a file"
     echo "    cat <file>          Display file contents"
     echo "    cp <source> <dest>  Copy a file"
     echo "    mv <source> <dest>  Move or rename a file"
@@ -110,6 +111,10 @@ do
         # File commands
         touch)
             fs_touch "${command_args[@]}"
+            ;;
+
+        write)
+            fs_write "${command_args[@]}"
             ;;
 
         cat)
